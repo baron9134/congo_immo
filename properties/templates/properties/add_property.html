@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ajouter un bien</title>
+</head>
+<body>
+    <h1>Ajouter un bien immobilier</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <fieldset>
+            <legend>Détails du bien</legend>
+            {{ form.as_p }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Images supplémentaires</legend>
+            {{ formset.management_form }}
+            {% for img_form in formset %}
+                {{ img_form.as_p }}
+            {% endfor %}
+        </fieldset>
+
+        <button type="submit">Enregistrer</button>
+    </form>
+
+    <a href="{% url 'home' %}">← Retour</a>
+</body>
+</html>

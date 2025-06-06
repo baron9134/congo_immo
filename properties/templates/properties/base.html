@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Congo Immo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Lien vers Tailwind CSS CDN pour du style rapide -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-blue-600">
+                <a href="{% url 'home' %}">CongoImmo</a>
+            </div>
+            <div class="space-x-4">
+                <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600">Accueil</a>
+                <a href="{% url 'add_property' %}" class="text-gray-700 hover:text-blue-600">Ajouter un bien</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">Compte</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <div class="max-w-7xl mx-auto p-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>
