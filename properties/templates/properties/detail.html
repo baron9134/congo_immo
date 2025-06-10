@@ -1,29 +1,105 @@
 {% extends 'properties/base.html' %}
+
 {% block content %}
-<div class="bg-white p-6 rounded shadow">
-    <h1 class="text-2xl font-bold mb-2">{{ property.title }}</h1>
-    <p class="text-gray-600">{{ property.address }}</p>
+<div class="bg-white rounded-lg shadow-lg p-6 max-w-6xl mx-auto mt-10 mb-12">
 
-    <!-- Image principale -->
-    <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="w-full h-96 object-cover rounded mt-4">
+    <div class="md:flex md:space-x-8">
+        <!-- Section images -->
+        <div class="md:w-2/3">
+            <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="rounded-lg w-full h-96 object-cover shadow-md">
 
-    <!-- Description -->
-    <p class="mt-4 text-gray-700">{{ property.description }}</p>
+            <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% for img in property.images.all %}
+                    <img src="{{ img.image.url }}" alt="Image supplémentaire" class="rounded-lg w-full h-32 md:h-40 object-cover shadow-sm hover:scale-105 transition-transform duration-300 cursor-pointer" />
+                {% endfor %}
+            </div>
+        </div>
 
-    <!-- Infos supplémentaires -->
-    <div class="mt-4">
-        <p><strong>Chambres :</strong> {{ property.bedrooms }}</p>
-        <p><strong>Salons :</strong> {{ property.living_rooms }}</p>
-        <p><strong>Eau incluse :</strong> {{ property.water_included|yesno:"Oui,Non" }}</p>
-        <p><strong>Électricité incluse :</strong> {{ property.electricity_included|yesno:"Oui,Non" }}</p>
-        <p><strong>Contact :</strong> {{ property.phone_number }}</p>
+        <!-- Section détails -->
+        <div class="md:w-1/3 mt-8 md:mt-0 flex flex-col justify-between">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900">{{ property.title }}</h1>
+                <p class="text-gray-500 mt-1">{{ property.address }}</p>
+
+                <p class="mt-4 text-gray-700 leading-relaxed">{{ property.description }}</p>
+
+                <div class="mt-6 space-y-3 text-gray-700">
+                    <p><strong>Chambres :</strong> {{ property.bedrooms }}</p>
+                    <p><strong>Salons :</strong> {{ property.living_rooms }}</p>
+                    <p><strong>Eau incluse :</strong> {{ property.water_included|yesno:"Oui,Non" }}</p>
+                    <p><strong>Électricité incluse :</strong> {{ property.electricity_included|yesno:"Oui,Non" }}</p>
+                    <p><strong>Contact :</strong> <a href="tel:{{ property.phone_number }}" class="text-blue-600 hover:underline">{{ property.phone_number }}</a></p>
+                    <p><strong>Type :</strong> {{ property.get_property_type_display }}</p>
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center space-x-4">
+                <button id="like-btn" aria-label="J'aime" class="text-3xl focus:outline-none">
+                    {% if user.is_authenticated and user in property.likes.all %}
+                        ❤️
+                    {% else %}
+                        🤍
+                    {% endif %}
+                </button>
+                <span id="like-count" class="text-gray-700 font-semibold text-lg">{{ property.total_likes }}</span> likes
+            </div>
+
+            {% if user == property.owner %}
+            <div class="mt-8 space-x-3">
+                <a href="{% url 'edit_property' property.id %}" class="inline-block w-full text-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Modifier</a>
+                <a href="{% url 'delete_property' property.id %}" 
+                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce bien ?');" 
+                   class="inline-block w-full text-center mt-3 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Supprimer</a>
+            </div>
+            {% endif %}
+        </div>
     </div>
 
-    <!-- Autres images -->
-    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        {% for img in property.images.all %}
-        <img src="{{ img.image.url }}" class="w-full h-40 object-cover rounded" alt="Autre photo">
+    <!-- Commentaires -->
+    <div class="mt-12 max-w-4xl mx-auto">
+        <h2 class="text-2xl font-bold mb-6 border-b pb-2">Commentaires</h2>
+
+        {% if user.is_authenticated %}
+        <form method="post" class="mb-6">
+            {% csrf_token %}
+            <textarea name="content" rows="3" required class="w-full p-3 border rounded resize-none focus:ring-2 focus:ring-blue-500" placeholder="Ajouter un commentaire...">{{ form.content.value }}</textarea>
+            <button type="submit" class="mt-3 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Commenter</button>
+        </form>
+        {% else %}
+        <p class="text-gray-500">Vous devez <a href="{% url 'login' %}" class="text-blue-600 underline">vous connecter</a> pour commenter.</p>
+        {% endif %}
+
+        {% for comment in comments %}
+            <div class="mb-6 border-b pb-4">
+                <p class="font-semibold text-gray-900">{{ comment.user.username }}</p>
+                <p class="text-gray-700 mt-1 whitespace-pre-line">{{ comment.content }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ comment.created_at|date:"d M Y H:i" }}</p>
+            </div>
+        {% empty %}
+            <p class="text-gray-500">Aucun commentaire pour le moment.</p>
         {% endfor %}
     </div>
+
 </div>
+
+{% if user.is_authenticated %}
+<script>
+    document.getElementById('like-btn').addEventListener('click', function () {
+        fetch("{% url 'toggle_like' property.pk %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('like-count').textContent = data.likes_count;
+            document.getElementById('like-btn').textContent = data.liked ? '❤️' : '🤍';
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}
+
+

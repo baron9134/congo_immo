@@ -1,0 +1,21 @@
+{% extends 'properties/base.html' %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-16 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-8 tracking-tight">Mon profil</h2>
+
+    <div class="space-y-4 text-gray-600 text-base">
+        <p><span class="font-medium text-gray-700">Nom d'utilisateur :</span> {{ user.username }}</p>
+        <p><span class="font-medium text-gray-700">Email :</span> {{ user.email }}</p>
+        <p><span class="font-medium text-gray-700">Prénom :</span> {{ user.first_name }}</p>
+        <p><span class="font-medium text-gray-700">Nom :</span> {{ user.last_name }}</p>
+        <p><span class="font-medium text-gray-700">Téléphone :</span> {{ user.userprofile.phone_number }}</p>
+    </div>
+
+    <div class="mt-8">
+        <a href="{% url 'edit_profile_view' %}" class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-full shadow hover:bg-blue-700 transition">
+            Modifier mon profil
+        </a>
+    </div>
+</div>
+{% endblock %}
+

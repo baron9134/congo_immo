@@ -1,0 +1,11 @@
+Bonjour {{ user.first_name }},
+
+Merci de vous être inscrit sur Congo Immo !  
+Veuillez cliquer sur le lien ci-dessous pour activer votre compte :
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+Si vous n’avez pas demandé cette inscription, ignorez simplement ce message.
+
+Cordialement,  
+L’équipe Congo Immo
