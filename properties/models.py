@@ -21,14 +21,15 @@ class City(models.Model):
 # Bien immobilier
 class Property(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=255)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
     price = models.PositiveIntegerField()
+    PropertyType = models.ForeignKey(PropertyType, on_delete=models.SET_NULL, null= True)
     description = models.TextField()
     main_image = models.ImageField(upload_to='properties/', null=True, blank=True)
-    bedrooms = models.IntegerField(default=0)
-    living_rooms = models.IntegerField(default=0)
+    bedrooms = models.PositiveIntegerField(default=0)
+    living_rooms = models.PositiveIntegerField(default=0)
     has_water = models.BooleanField(default=False, null=True, blank=True)
     has_electricity = models.BooleanField(default=False,  null=True, blank=True)
     phone_number = models.IntegerField(default=0)
@@ -38,8 +39,7 @@ class Property(models.Model):
         ('sale', 'À vendre'),
         ('rent', 'À louer'),
     ]
-    listing_type = models.CharField(max_length=10, choices=LISTING_TYPE_CHOICES, default='sale')
-    property_type = models.CharField(max_length=10, choices=LISTING_TYPE_CHOICES, default='rent')
+    property_type = models.CharField(max_length=10, choices=LISTING_TYPE_CHOICES, default='sale')
     likes = models.ManyToManyField(User, related_name='liked_properties', blank=True)
     def total_likes(self):
         return self.likes.count()

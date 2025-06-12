@@ -12,7 +12,7 @@
 <nav class="bg-white shadow p-4 flex items-center justify-between relative">
     <!-- Logo -->
     <div class="text-xl font-bold">
-        <a href="{% url 'home' %}">Congo Immo</a>
+        <a href="{% url 'home' %}">KUZUA </a>
     </div>
 
     <!-- Menu desktop -->
@@ -43,7 +43,8 @@
     </div>
 
     <!-- Menu mobile -->
-    <div id="mobile-menu" class="hidden absolute right-4 top-16 bg-white shadow rounded p-4 flex flex-col space-y-2 w-48 z-50">
+    <div id="mobile-menu" class="hidden bg-white shadow rounded p-4 flex flex-col space-y-2 w-48 z-50">
+
         {% if user.is_authenticated %}
             <a href="{% url 'profile' %}" class="hover:underline">Compte</a>
             <a href="{% url 'my_properties' %}" class="hover:underline">Mes biens</a>

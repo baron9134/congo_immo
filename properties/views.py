@@ -80,14 +80,16 @@ def toggle_like(request, pk):
         prop.likes.add(request.user)
         liked = True
     return JsonResponse({'liked': liked, 'likes_count': prop.total_likes()})
-
+@login_required
 def add_property(request):
     if request.method == 'POST':
         form = PropertyForm(request.POST, request.FILES)
         formset = PropertyImageFormSet(request.POST, request.FILES, queryset=PropertyImage.objects.none())
 
         if form.is_valid() and formset.is_valid():
-            property_instance = form.save()
+            property_instance = form.save(commit=False)
+            property_instance.owner = request.user  # ✅ Associer le bien à l'utilisateur
+            property_instance.save()
 
             for image_form in formset:
                 if image_form.cleaned_data.get('image'):
@@ -105,6 +107,7 @@ def add_property(request):
         'form': form,
         'formset': formset
     })
+
 @login_required
 def edit_property(request, pk):
     prop = get_object_or_404(Property, pk=pk,  owner=request.user)
